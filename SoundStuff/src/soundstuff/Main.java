@@ -3,6 +3,7 @@ package soundstuff;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
@@ -63,7 +64,10 @@ public class Main {
 				for (int i = 0; i < keyboardNotes.length; i++) {
 					g2.setColor(Color.LIGHT_GRAY);
 					g2.fillRect(i * 600 / keyboardNotes.length + 1, 1, 600 / keyboardNotes.length - 2, 398);
-					g2.drawString(noteNames[i], i * 600 / keyboardNotes.length, y);
+					g2.setFont(new Font("Arial", Font.PLAIN, 24));
+					g2.setColor(Color.BLACK);
+					g2.drawString(noteNames[i], (i * 600 / keyboardNotes.length), 400);
+					g2.drawString(noteNames[i], (i * 600 / keyboardNotes.length), 200);
 				}
 				g2.setColor(Color.DARK_GRAY);
 				g2.setStroke(new BasicStroke(2.0f));
@@ -172,7 +176,9 @@ public class Main {
 						
 						if (noteForHandID.containsKey(hand.id())) {
 							int oldnote = noteForHandID.get(hand.id());
-							channel.noteOff(oldnote);
+							if (newnote != oldnote) {
+								channel.noteOff(oldnote);
+							}
 						} else {
 							channel.noteOn(newnote, 600);
 						}
