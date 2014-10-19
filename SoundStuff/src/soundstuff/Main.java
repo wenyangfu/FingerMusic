@@ -33,7 +33,7 @@ public class Main {
 	
 	private static Controller controller = new Controller();
 	
-	private static HandList handlist = null;
+	private static FingerList handlist = null; // TODO: Change Fingerlist to HandList
 	private static Map<Integer, Integer> noteForHandID = new HashMap<Integer, Integer>();
 	//private static Map<Integer, Boolean> fast
 	
@@ -75,23 +75,25 @@ public class Main {
 				g2.drawLine(0, 200, 600, 200);
 				
 				if (handlist != null) {
-					for (Hand hand : handlist) {
-						g2.setColor(Color.YELLOW);
-						int x = (int) (600.0 / keyboardNotes.length * (0.5 * keyboardNotes.length + hand.palmPosition().getX() / distancePerNote));
-						int y = 200 - (int) (hand.palmPosition().getY() - 200.0);
-						g2.fillOval(x - 20, y - 20, 40, 40);
-						g2.setColor(Color.RED);
-						float handzpos = hand.palmPosition().getZ();
-						int r;
-						if (handzpos > 0 && handzpos < 100) {
-							r = 20 - (int) handzpos / 5;
-						} else if (handzpos <= 0) {
-							g2.setColor(Color.GREEN);
-							r = (int) (20 * Math.exp(0.005 * handzpos));
-						} else {
-							r = 0;
+					for (Finger hand : handlist) { // TODO: Change Finger to Hand
+						if (hand.isExtended()) {
+							g2.setColor(Color.YELLOW);
+							int x = (int) (600.0 / keyboardNotes.length * (0.5 * keyboardNotes.length + hand.tipPosition().getX() / distancePerNote));
+							int y = 200 - (int) (hand.tipPosition().getY() - 200.0); // TODO: tip to hand
+							g2.fillOval(x - 20, y - 20, 40, 40);
+							g2.setColor(Color.RED); // TODO: tip to hand
+							float handzpos = hand.tipPosition().getZ();
+							int r;
+							if (handzpos > 0 && handzpos < 100) {
+								r = 20 - (int) handzpos / 5;
+							} else if (handzpos <= 0) {
+								g2.setColor(Color.GREEN);
+								r = (int) (20 * Math.exp(0.005 * handzpos));
+							} else {
+								r = 0;
+							}
+							g2.fillOval(x - r, y - r, 2 * r, 2 * r);
 						}
-						g2.fillOval(x - r, y - r, 2 * r, 2 * r);
 					}	
 				}
 			}
@@ -159,10 +161,10 @@ public class Main {
 			public void actionPerformed(ActionEvent arg0) {
 				Frame frame = controller.frame();
 				MidiChannel channel = synth.getChannels()[channelNum];
-				handlist = frame.hands();
-				for (Hand hand : frame.hands()) {
-					if (hand.palmPosition().getZ() < 0.0) {
-						int index = (int) (0.5 * keyboardNotes.length + hand.palmPosition().getX() / distancePerNote);
+				handlist = frame.fingers();
+				for (Finger hand : frame.fingers()) {
+					if (hand.isExtended() && hand.tipPosition().getZ() < 0.0) {
+						int index = (int) (0.5 * keyboardNotes.length + hand.tipPosition().getX() / distancePerNote);
 						if (index < 0) {
 							index = 0;
 						} else if (index >= keyboardNotes.length) {
@@ -170,7 +172,7 @@ public class Main {
 						}
 						int newnote = keyboardNotes[index];
 						
-						if (hand.palmPosition().getY() > 200.0) {
+						if (hand.tipPosition().getY() > 200.0) {
 							newnote += 12;
 						}
 						
